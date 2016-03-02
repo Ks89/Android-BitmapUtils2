@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">BitmapUtilsExample</string>
+
+    <string-array name="effects">
+        <item>Original</item>
+        <item>Gray scale</item>
+        <item>Flip horizontally</item>
+        <item>Flip vertically</item>
+        <item>Scale red silhouette in frame</item>
+        <item>Overlay yellow over grayscale</item>
+        <item>Rotate</item>
+        <item>Scale removing border</item>
+        <item>Color 2/5 over grayscale</item>
+        <item>Yellow Silohuette</item>
+        <item>Scale inside frame</item>
+        <item>Coming soon...</item>
+        <item>Request a feature!!!</item>
+    </string-array>
 </resources>
