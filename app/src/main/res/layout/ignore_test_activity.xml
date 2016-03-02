@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/holo_blue_dark">
+
+    <ImageView
+        android:id="@+id/testImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/elephant_free_from_web"/>
+
+    <Button
+        android:id="@+id/tb1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:text="New Button"/>
+
+    <Button
+        android:id="@+id/tb2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/tb1"
+        android:layout_toEndOf="@+id/tb1"
+        android:text="New Button"/>
+
+    <Button
+        android:id="@+id/tb3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/tb2"
+        android:layout_toEndOf="@+id/tb2"
+        android:text="New Button"/>
+
+    <Button
+        android:id="@+id/tb4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/tb3"
+        android:text="New Button"/>
+
+    <Button
+        android:id="@+id/tb5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/tb4"
+        android:text="New Button"/>
+
+    <Button
+        android:id="@+id/tb6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/tb5"
+        android:layout_toEndOf="@+id/tb5"
+        android:text="New Button"/>
+
+    <Button
+        android:id="@+id/tb7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/tb11"
+        android:layout_toEndOf="@+id/tb11"
+        android:text="New Button"/>
+
+    <Button
+        android:id="@+id/tb8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tb1"
+        android:layout_alignParentStart="true"
+        android:text="New Button"/>
+
+    <Button
+        android:id="@+id/tb9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/tb8"
+        android:layout_toEndOf="@+id/tb8"
+        android:text="New Button"/>
+
+    <Button
+        android:id="@+id/tb10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/tb9"
+        android:layout_toStartOf="@+id/tb4"
+        android:text="New Button"/>
+
+    <Button
+        android:id="@+id/tb11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tb3"
+        android:layout_toEndOf="@+id/tb3"
+        android:text="NEWWWW"/>
+</RelativeLayout>
