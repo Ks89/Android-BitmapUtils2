@@ -55,6 +55,21 @@
                 delta = originalTotalHeight / numStages;
             }
             break;
+            case "R2L" :
+            int originalTotalWidth = bitmapList.get(0).getWidth() * numStages;
+            Bitmap finalBitmap = Bitmap.createBitmap(originalTotalWidth, bitmapList.get(0).getHeight(), Bitmap.Config.ARGB_8888);
+            float delta = 0f;
+            Canvas comboImage = new Canvas(finalBitmap);
+            for (int i = numStages - 1 ; i >= 0 ; i--) {
+                comboImage.translate(delta, 0f);
+                if (i > currentStage) {
+                    comboImage.drawBitmap(bitmapList.get(i), 0f, 0f, paint);
+                } else {
+                    comboImage.drawBitmap(bitmapList.get(i), 0f, 0f, null);
+                }
+                delta = originalTotalWidth / numStages;
+            }
+            break;
         }
         return finalBitmap;
     }
