@@ -6,10 +6,12 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
+import java.io.IOException;
 import java.util.List;
 
 import butterknife.Bind;
@@ -50,15 +52,18 @@ public class TestActivity extends AppCompatActivity {
     private static final int FLIPV=3;
     private static final int SCALECOLSILHOUETTEINSIDECOLOREDFRAME=4;
     private static final int OVERLAYCOLGRAYSCALE=5;
-    private static final int ROTATE=6;
-    private static final int SCALE=7;
-    private static final int PIECESGRAYSCALED=8;
-    private static final int SILHOUETTECOLOR=9;
-    private static final int SCALEINSIDEFRAME=10;
+    private static final int OVERLAYCOLGRAYSCALENEW=6;
+    private static final int ROTATE=7;
+    private static final int SCALE=8;
+    private static final int PIECESGRAYSCALED=9;
+    private static final int PIECESGRAYSCALEDVERTICAL=10;
+    private static final int SILHOUETTECOLOR=11;
+    private static final int SCALEINSIDEFRAME=12;
 
 
     @OnItemSelected(R.id.effects_spinner)
     public void onItemSelected(int position) {
+        List<Bitmap> piecesList;
         switch(position) {
             default:
             case ORIGINAL:
@@ -68,33 +73,50 @@ public class TestActivity extends AppCompatActivity {
                 imageView.setImageBitmap(BitmapUtils.toGrayscale(bitmap));
                 break;
             case FLIPH:
-                imageView.setImageBitmap(BitmapUtils.flipHorizonallyBitmap(bitmap));
+                imageView.setImageBitmap(BitmapUtils.flipHorizonally(bitmap));
                 break;
             case FLIPV:
-                imageView.setImageBitmap(BitmapUtils.flipVerticallyBitmap(bitmap));
+                imageView.setImageBitmap(BitmapUtils.flipVertically(bitmap));
                 break;
             case SCALECOLSILHOUETTEINSIDECOLOREDFRAME:
                 imageView.setImageBitmap(BitmapUtils.getScaledColorSilhouetteInsideColoredFrame(bitmap, 0.5f, Color.TRANSPARENT, Color.RED));
                 break;
             case OVERLAYCOLGRAYSCALE:
-                imageView.setImageBitmap(BitmapUtils.overlayColorOnGrayScale(bitmap, Color.YELLOW));
+                imageView.setImageBitmap(BitmapUtils.overlayColorOnGrayScaleOptimized1(bitmap, Color.YELLOW));
+                break;
+            case OVERLAYCOLGRAYSCALENEW:
+                try {
+                    imageView.setImageBitmap(BitmapUtils.overlayColorOnGrayScaleOptimized2(bitmap, Color.YELLOW));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+//                try {
+//                    imageView.setImageBitmap(BitmapUtils.overlayColorOnGrayScaleOptimized(getResources(), R.drawable.lion8, Color.YELLOW));
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
                 break;
             case ROTATE:
-                imageView.setImageBitmap(BitmapUtils.rotateBitmap(bitmap, 90));
+                imageView.setImageBitmap(BitmapUtils.rotate(bitmap, 90));
                 break;
             case SCALE:
-                imageView.setImageBitmap(BitmapUtils.scaleBitmap(bitmap, 500, 500));
+                imageView.setImageBitmap(BitmapUtils.scale(bitmap, 500, 500));
                 break;
             case PIECESGRAYSCALED:
-                List<Bitmap> piecesList = BitmapUtils.splitImage(BitmapFactory.decodeResource(getResources(), R.drawable.lion8), 5);
+                piecesList = BitmapUtils.splitImage(BitmapFactory.decodeResource(getResources(), R.drawable.lion8), 5);
                 //this colors the first 2 (1+1, because current starts from 0) pieces over the size of the piecesList
-                imageView.setImageBitmap(BitmapUtils.getNewCombinedByPiecesAlsoGrayscaled(piecesList, 1, piecesList.size()));
+                imageView.setImageBitmap(BitmapUtils.getNewCombinedByPiecesAlsoGrayscaled(piecesList, 3, piecesList.size(), "R2L"));
+                break;
+            case PIECESGRAYSCALEDVERTICAL:
+                piecesList = BitmapUtils.splitImageVertically(BitmapFactory.decodeResource(getResources(), R.drawable.lion8), 5);
+                //this colors the first 2 (1+1, because current starts from 0) pieces over the size of the piecesList
+                imageView.setImageBitmap(BitmapUtils.getNewCombinedByPiecesAlsoGrayscaled(piecesList, 3, piecesList.size(), "D2U"));
                 break;
             case SILHOUETTECOLOR:
-                imageView.setImageDrawable(BitmapUtils.getDrawableSilhouetteWithColor(getResources().getDrawable(R.drawable.lion8), Color.YELLOW));
+                imageView.setImageDrawable(BitmapUtils.getSilhouetteWithColor(getResources().getDrawable(R.drawable.lion8), Color.YELLOW));
                 break;
             case SCALEINSIDEFRAME:
-                imageView.setImageBitmap(BitmapUtils.scaleInsideWithFrame(bitmap, 0.5f, Color.TRANSPARENT));
+                imageView.setImageBitmap(BitmapUtils.scaleInsideColoredFrame(bitmap, 0.5f, Color.TRANSPARENT));
                 break;
         }
     }

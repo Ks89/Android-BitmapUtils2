@@ -13,106 +13,149 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.util.Log;
+import android.util.TypedValue;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileDescriptor;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Stefano Cappa on 05/08/15.
+ * Updated by Stefano Cappa on 03/03/16 before the public release
  */
 public class BitmapUtils {
 
     /**
-     * Method to remove color in a Bitmap, creating a gray scale image.
+     * Method to remove colors in a Bitmap, creating a gray scale image.
      *
-     * @param bmpOriginal The original Bitmap.
+     * @param source The original Bitmap.
      * @return The gray scale Bitmap.
      */
-    public static Bitmap toGrayscale(Bitmap bmpOriginal) {
-        Bitmap bmpGrayscale = Bitmap.createBitmap(bmpOriginal.getWidth(), bmpOriginal.getHeight(), Bitmap.Config.ARGB_8888);
-
+    public static Bitmap toGrayscale(Bitmap source) {
+        Bitmap bmpGrayscale = Bitmap.createBitmap(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bmpGrayscale);
+        canvas.drawBitmap(source, 0, 0, getGrayScalePaint());
+        return bmpGrayscale;
+    }
+
+    //private method to get a gray scale paint, totally independent from bitmaps passed
+    private static Paint getGrayScalePaint() {
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         ColorMatrix cm = new ColorMatrix();
         cm.setSaturation(0);
         ColorMatrixColorFilter colorMatrixColorFilter = new ColorMatrixColorFilter(cm);
         paint.setColorFilter(colorMatrixColorFilter);
-        canvas.drawBitmap(bmpOriginal, 0, 0, paint);
-
-        return bmpGrayscale;
+        return paint;
     }
 
     /**
-     * TODO doc
+     * Method to rotate a Bitmap specifying the angle.
      *
-     * @param source
-     * @param angle
-     * @return
+     * @param source The original Bitmap.
+     * @param angle  float that represents the rotation angle.
+     * @return The rotated Bitmap.
      */
-    public static Bitmap rotateBitmap(Bitmap source, float angle) {
+    public static Bitmap rotate(Bitmap source, float angle) {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
     /**
-     * TODO doc
+     * Method to flip vertically a Bitmap.
      *
-     * @param source
-     * @return
+     * @param source The original Bitmap.
+     * @return The flipped Bitmap.
      */
-    public static Bitmap flipVerticallyBitmap(Bitmap source) {
+    public static Bitmap flipVertically(Bitmap source) {
         Matrix m = new Matrix();
         m.preScale(1, -1);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), m, false);
     }
 
     /**
-     * TODO doc
+     * Method to flip horizontally a Bitmap.
      *
-     * @param source
-     * @return
+     * @param source The original Bitmap.
+     * @return The flipped Bitmap.
      */
-    public static Bitmap flipHorizonallyBitmap(Bitmap source) {
+    public static Bitmap flipHorizonally(Bitmap source) {
         Matrix m = new Matrix();
         m.setScale(-1, 1);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), m, false);
     }
 
-    public static Bitmap scaleBitmap(Bitmap source, int newWidth, int newHeight) {
+    /**
+     * Method to scale a Bitmap specifying width and height.
+     * If newWidth and newHeight are the same as the current width and height of
+     * the source bitmap, the source bitmap is returned and no new bitmap is
+     * created.
+     * I suggest to use scaleByFactor(...) method to maintain original proportions.
+     *
+     * @param source    The original Bitmap.
+     * @param newWidth  int that represents the desired width.
+     * @param newHeight int that represents the desired height.
+     * @return The scaled Bitmap.
+     */
+    public static Bitmap scale(Bitmap source, int newWidth, int newHeight) {
         return Bitmap.createScaledBitmap(source, newWidth, newHeight, true);
     }
 
-    public static Bitmap scaleBitmapByFactor(Bitmap source, float factor) {
+    /**
+     * Method to scale a Bitmap specifying the scaling factor as a float.
+     * If factor==1, the source bitmap is returned and no new bitmap is
+     * created.
+     *
+     * @param source The original Bitmap.
+     * @param factor float that represents the scaling factor.
+     * @return The scaled Bitmap.
+     */
+    public static Bitmap scaleByFactor(Bitmap source, float factor) {
         int newWidth = (int) (source.getWidth() * factor);
         int newHeight = (int) (source.getHeight() * factor);
-        return Bitmap.createScaledBitmap(source, newWidth, newHeight, true);
+        return scale(source, newWidth, newHeight);
     }
 
-    public static Bitmap clearBitmap(Bitmap sourceBitmap) {
-        Bitmap newBitmap = Bitmap.createBitmap(sourceBitmap, 0, 0, sourceBitmap.getWidth(), sourceBitmap.getHeight());
+    /**
+     * Method to create a fully-transparent Bitmap using the same size of the source passed as
+     * parameter and also the same density.
+     *
+     * @param source The original Bitmap.
+     * @return A transparent Bitmap with the same size of the source.
+     */
+    public static Bitmap clear(Bitmap source) {
+        Bitmap newBitmap = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight());
+        //to erase the color from a Bitmap, I must use a mutable Bitmap!!!!
         Bitmap mutableBitmap = newBitmap.copy(Bitmap.Config.ARGB_8888, true);
         mutableBitmap.eraseColor(Color.TRANSPARENT);
         return mutableBitmap;
     }
 
+
     /**
-     * Method to scale {@code sourceBitmap}, maintaining the same original size of the bitmap,
+     * Method to scale {@code sourceBitmap}, maintaining the same original size,
      * but with a transparent frame and the scaled and centered {@code sourceBitmap} inside.
      *
-     * @return
+     * @param mutableBitmap The original Bitmap.
+     * @param factor        float that represents the scaling factor.
+     * @param color         Color of the frame.
+     * @return The scaled Bitmap with a colored (or TRANSPARENT) border.
      */
-    public static Bitmap scaleInsideWithFrame(Bitmap mutableBitmap, float factor, int color) {
+    public static Bitmap scaleInsideColoredFrame(Bitmap mutableBitmap, float factor, int color) {
         Bitmap clearBitmap = mutableBitmap.copy(Bitmap.Config.ARGB_8888, true);
         clearBitmap.eraseColor(color);
 
-        Bitmap resizedInsideBitmap = scaleBitmapByFactor(mutableBitmap, factor);
+        Bitmap resizedInsideBitmap = scaleByFactor(mutableBitmap, factor);
 
         int frameWidth = clearBitmap.getWidth();
         int frameHeight = clearBitmap.getHeight();
@@ -126,15 +169,56 @@ public class BitmapUtils {
         return clearBitmap;
     }
 
+
     /**
-     * TODO write documentation
+     * Method to get a colored Drawable silhouette.
      *
-     * @param sourceBitmap
-     * @param color
-     * @return
+     * @param sourceBitmap The original Bitmap.
+     * @param color        Color of the frame.
+     * @return The colored Drawable silohuette.
      */
-    public static Bitmap overlayColor(Bitmap sourceBitmap, int color) {
-        Bitmap newBitmap = Bitmap.createBitmap(sourceBitmap, 0, 0, sourceBitmap.getWidth(), sourceBitmap.getHeight());
+    public static Drawable getSilhouetteWithColor(Drawable sourceBitmap, int color) {
+        sourceBitmap.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        return sourceBitmap;
+    }
+
+
+    /**
+     * Method to get a scaled colored silhouette inside a colored/transparent frame).
+     *
+     * @param source          The original Bitmap.
+     * @param factor          float that represents the scaling factor.
+     * @param frameColor      Color of the frame.
+     * @param silhouetteColor Color of the silhouette that you want.
+     * @return The scaled and colored silhouette inside a colored/transparent frame.
+     */
+    public static Bitmap getScaledColorSilhouetteInsideColoredFrame(Bitmap source, float factor, int frameColor, int silhouetteColor) {
+        Bitmap scaledMutableBitmap = BitmapUtils.scaleInsideColoredFrame(source, factor, frameColor);
+        Canvas c = new Canvas(scaledMutableBitmap);
+        Paint p = new Paint();
+        p.setAntiAlias(true);
+        p.setColorFilter(new PorterDuffColorFilter(silhouetteColor, PorterDuff.Mode.SRC_ATOP));
+        c.drawBitmap(scaledMutableBitmap, 0.f, 0.f, p);
+        return scaledMutableBitmap;
+    }
+
+
+    /**
+     * Method to overlay color on a gray scale Bitmap.
+     *
+     * @param source The original Bitmap.
+     * @param color  Color to overlay.
+     * @return A colored gray scale Bitmap.
+     */
+    @Deprecated
+    public static Bitmap overlayColorOnGrayScale(Bitmap source, int color) {
+        Bitmap result = toGrayscale(source);
+        return overlayColor(result, color);
+    }
+
+    @Deprecated
+    private static Bitmap overlayColor(Bitmap source, int color) {
+        Bitmap newBitmap = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight());
         Bitmap mutableBitmap = newBitmap.copy(Bitmap.Config.ARGB_8888, true);
         Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
@@ -147,49 +231,220 @@ public class BitmapUtils {
 
 
     /**
-     * TODO doc
+     * ---------------------------------------------------------------------------
+     * USE THIS METHOD AND NOT THE OLDER VERSION CALLED: "overlayColorOnGrayScale"
+     * ---------------------------------------------------------------------------
+     * Method to overlay color on a gray scale Bitmap.
      *
-     * @param sourceBitmap
-     * @param color
-     * @return
+     * @param source The original Bitmap.
+     * @param color  Color to overlay.
+     * @return A colored gray scale Bitmap.
      */
-    public static Drawable getDrawableSilhouetteWithColor(Drawable sourceBitmap, int color) {
-        sourceBitmap.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-        return sourceBitmap;
+    public static Bitmap overlayColorOnGrayScaleOptimized1(Bitmap source, int color)  {
+        Bitmap newBitmap = Bitmap.createBitmap(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap mutableBitmap = newBitmap.copy(Bitmap.Config.ARGB_8888, true);
+
+        Canvas canvas = new Canvas(mutableBitmap);
+        canvas.drawBitmap(source, 0, 0, getGrayScalePaint());
+
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        ColorFilter filter = new LightingColorFilter(color, 1);
+        paint.setColorFilter(filter);
+        canvas.drawBitmap(mutableBitmap, 0, 0, paint);
+
+        return mutableBitmap;
+    }
+    public static Bitmap overlayColorOnGrayScaleOptimized(Resources res, int id, int color) throws IOException {
+        Bitmap mutableBitmap = getMutableBitmap(res, id);
+
+        Canvas canvas = new Canvas(mutableBitmap);
+        canvas.drawBitmap(mutableBitmap, 0, 0, getGrayScalePaint());
+
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        ColorFilter filter = new LightingColorFilter(color, 1);
+        paint.setColorFilter(filter);
+        canvas.drawBitmap(mutableBitmap, 0, 0, paint);
+
+        return mutableBitmap;
+    }
+    public static Bitmap overlayColorOnGrayScaleOptimized2(Bitmap source, int color) throws IOException {
+        Bitmap mutableBitmap = getMutableBitmap(source);
+
+        Canvas canvas = new Canvas(mutableBitmap);
+        canvas.drawBitmap(mutableBitmap, 0, 0, getGrayScalePaint());
+
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        ColorFilter filter = new LightingColorFilter(color, 1);
+        paint.setColorFilter(filter);
+        canvas.drawBitmap(mutableBitmap, 0, 0, paint);
+
+        return mutableBitmap;
     }
 
 
-    /**
-     * Todo doc
-     *
-     * @param sourceBitmap
-     * @param scale
-     * @param frameColor
-     * @param silhouetteColor
-     * @return
-     */
-    public static Bitmap getScaledColorSilhouetteInsideColoredFrame(Bitmap sourceBitmap, float scale, int frameColor, int silhouetteColor) {
-        Bitmap scaledMutableBitmap = BitmapUtils.scaleInsideWithFrame(sourceBitmap, scale, frameColor);
-        Canvas c = new Canvas(scaledMutableBitmap);
-        Paint p = new Paint();
-        p.setAntiAlias(true);
-        p.setColorFilter(new PorterDuffColorFilter(silhouetteColor, PorterDuff.Mode.SRC_ATOP));
-        c.drawBitmap(scaledMutableBitmap, 0.f, 0.f, p);
-        return scaledMutableBitmap;
+    //*************************************************************************************************
+
+
+    //new exp version with orientation
+    public static Bitmap getNewCombinedByPiecesAlsoGrayscaled(List<Bitmap> bitmapList, int currentStage, int numStages, String direction) {
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        ColorMatrix cm = new ColorMatrix();
+        cm.setSaturation(0);
+        ColorMatrixColorFilter colorMatrixColorFilter = new ColorMatrixColorFilter(cm);
+        paint.setColorFilter(colorMatrixColorFilter);
+
+        Bitmap finalBitmap = null;
+        float delta = 0f;
+        Canvas comboImage;
+        int originalTotalWidth, originalTotalHeight;
+
+        //i mean, don't use greyscale, but add here all the functionalities to reuse the canvas
+        switch (direction) {
+
+            case "L2R":
+                originalTotalWidth = bitmapList.get(0).getWidth() * numStages;
+                finalBitmap = createTransparentBitmap(originalTotalWidth, bitmapList.get(0).getHeight());
+                comboImage = new Canvas(finalBitmap);
+                for (int i = 0; i < numStages; i++) {
+                    comboImage.translate(delta, 0f);
+                    //   0  1  2  3  4
+                    //   v  v  v  x  x
+                    //            c
+                    //    0..1..2<3
+                    if (i > currentStage) {
+                        //grey
+                        comboImage.drawBitmap(bitmapList.get(i), 0f, 0f, paint);
+                    } else {
+                        comboImage.drawBitmap(bitmapList.get(i), 0f, 0f, null);
+                    }
+                    delta = originalTotalWidth / numStages;
+                }
+                break;
+            case "U2D":
+                originalTotalHeight = bitmapList.get(0).getHeight() * numStages;
+                finalBitmap = createTransparentBitmap(bitmapList.get(0).getWidth(), originalTotalHeight);
+                comboImage = new Canvas(finalBitmap);
+                for (int i = 0; i < numStages; i++) {
+                    comboImage.translate(0f, delta);
+                    /*
+                        0  v      0
+                        1  v      1
+                        2  v c-1  2
+                        3  x  c  3>c-1
+                        4  x
+
+                     */
+                    if (i > currentStage - 1) {
+                        //grey
+                        comboImage.drawBitmap(bitmapList.get(i), 0f, 0f, paint);
+                    } else {
+                        comboImage.drawBitmap(bitmapList.get(i), 0f, 0f, null);
+                    }
+                    delta = originalTotalHeight / numStages;
+                }
+                break;
+            case "D2U":
+                originalTotalHeight = bitmapList.get(0).getHeight() * numStages;
+                finalBitmap = createTransparentBitmap(bitmapList.get(0).getWidth(), originalTotalHeight);
+                comboImage = new Canvas(finalBitmap);
+                for (int i = 0 ; i < numStages; i++) {
+                    comboImage.translate(0f, delta);
+                    if (i < currentStage - 1) {
+                        //grey
+                        comboImage.drawBitmap(bitmapList.get(i), 0f, 0f, paint);
+                    } else {
+                        comboImage.drawBitmap(bitmapList.get(i), 0f, 0f, null);
+                    }
+                    delta = originalTotalHeight / numStages;
+                }
+                break;
+            case "R2L":
+                originalTotalWidth = bitmapList.get(0).getWidth() * numStages;
+                finalBitmap = createTransparentBitmap(originalTotalWidth, bitmapList.get(0).getHeight());
+                comboImage = new Canvas(finalBitmap);
+                for (int i = 0 ; i < numStages; i++) {
+                    comboImage.translate(delta, 0f);
+                    //   0  1  2  3  4
+                    //   x  x  v  v  v
+                    //        c-1
+                    //   0..1<3-1
+                    if (i < currentStage - 1) {
+                        //grey
+                        comboImage.drawBitmap(bitmapList.get(i), 0f, 0f, paint);
+                    } else {
+                        comboImage.drawBitmap(bitmapList.get(i), 0f, 0f, null);
+                    }
+                    delta = originalTotalWidth / numStages;
+                }
+                break;
+        }
+        return finalBitmap;
     }
 
 
-    /**
-     * TODO doc
-     *
-     * @param original
-     * @param color
-     * @return
-     */
-    public static Bitmap overlayColorOnGrayScale(Bitmap original, int color) {
-        Bitmap result = toGrayscale(original);
-        return overlayColor(result, color);
+    public static Bitmap createTransparentBitmap(int w, int h) {
+        return Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
     }
+
+    public static Bitmap createColoredBitmap(int colors[], int offset, int stride, int width, int height, Bitmap.Config config) {
+        return Bitmap.createBitmap(colors, offset, stride, width, height, config);
+    }
+
+
+    public static List<Bitmap> splitImageVertically(Bitmap bmpOriginal, int numStages) {
+        List<Bitmap> pieces = new ArrayList<>();
+        int height = bmpOriginal.getHeight() / numStages;
+        int start = 0;
+        for (int i = 0; i < numStages; i++) {
+            Bitmap pieceBitmap = Bitmap.createBitmap(bmpOriginal, 0, start, bmpOriginal.getWidth() - 1, height - 1);
+            pieces.add(pieceBitmap);
+            start = (bmpOriginal.getHeight() / numStages) * (i + 1);
+        }
+        return pieces;
+    }
+
+    //efficient way to get a mutable bitmap
+    public static Bitmap getMutableBitmap(Bitmap immutable) throws IOException {
+        byte[] byteArray = toByteArrayNew(immutable);
+        Bitmap result = getMutableBitmap(byteArray, 0, byteArray.length);
+        byteArray = null;
+        return result;
+    }
+
+    public static Bitmap getMutableBitmap(byte[] data, int offset, int length) {
+        return BitmapFactory.decodeByteArray(data, offset, length, getMutableOption());
+    }
+
+    public static Bitmap getMutableBitmap(String filePath) {
+        return BitmapFactory.decodeFile(filePath, getMutableOption());
+    }
+
+    public static Bitmap getMutableBitmap(FileDescriptor fd, Rect outPadding) {
+        return BitmapFactory.decodeFileDescriptor(fd, outPadding, getMutableOption());
+    }
+
+    public static Bitmap getMutableBitmap(Resources res, int id) {
+        return BitmapFactory.decodeResource(res, id, getMutableOption());
+    }
+
+    public static Bitmap getMutableBitmap(Resources res, TypedValue value, InputStream is, Rect pad) {
+        return BitmapFactory.decodeResourceStream(res, value, is, pad, getMutableOption());
+    }
+
+    public static Bitmap getMutableBitmap(InputStream is, Rect outPadding) {
+        return BitmapFactory.decodeStream(is, outPadding, getMutableOption());
+    }
+
+    private static BitmapFactory.Options getMutableOption() {
+        BitmapFactory.Options opt = new BitmapFactory.Options();
+        opt.inMutable = true;
+        return opt;
+    }
+
 
     /**
      * Method to split an image in {@code numStages} pieces.
@@ -312,6 +567,17 @@ public class BitmapUtils {
         byte[] photoByteArray = blob.toByteArray();
         blob.close();
         return photoByteArray;
+    }
+
+    public static byte[] toByteArrayNew(Bitmap source) {
+        //int size = source.getRowBytes() * source.getHeight();
+        int size = source.getByteCount();
+        ByteBuffer byteBuffer = ByteBuffer.allocate(size);
+        source.copyPixelsToBuffer(byteBuffer);
+        //byteBuffer.rewind();
+        Log.d("sas", "sas." + byteBuffer.get(1300));
+        byte[] b = byteBuffer.array();
+        return b;
     }
 
     /**
