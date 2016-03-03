@@ -55,7 +55,7 @@
                 delta = originalTotalHeight / numStages;
             }
             break;
-            case "R2L" :
+          case "R2L" :
             int originalTotalWidth = bitmapList.get(0).getWidth() * numStages;
             Bitmap finalBitmap = Bitmap.createBitmap(originalTotalWidth, bitmapList.get(0).getHeight(), Bitmap.Config.ARGB_8888);
             float delta = 0f;
@@ -73,3 +73,28 @@
         }
         return finalBitmap;
     }
+    
+    
+    public static Bitmap createTransparentBitmap(int w, int h) {
+        return Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+    }
+    
+    public static Bitmap createColoredBitmap(int colors[], int offset, int stride, int width, int height, Config config) {
+        return Bitmap.createBitmap(colors, offset, stride, width, height, config);
+    }
+    
+  
+ 
+    public static List<Bitmap> splitImageVertically(Bitmap bmpOriginal, int numStages) {
+        List<Bitmap> pieces = new ArrayList<>();
+        int height = bmpOriginal.getHeight() / numStages;
+        int start = 0;
+        for (int i = 0; i < numStages; i++) {
+            Bitmap pieceBitmap = Bitmap.createBitmap(bmpOriginal, 0 , start, bmpOriginal.getWidth() - 1, height - 1);
+            pieces.add(pieceBitmap);
+            start = (bmpOriginal.getHeight() / numStages) * (i + 1);
+        }
+        return pieces;
+    }
+    
+    
