@@ -98,6 +98,9 @@
     }
     
     //efficient way to get a mutable bitmap
+    public static Bitmap getMutableBitmap(Bitmap immutable) {
+        return getMutableBitmap(toByteArray(immutable), 0, byteArray.length);
+    }
     public static Bitmap getMutableBitmap(byte[] data, int offset, int length) {
         return BitmapFactory.decodeByteArray(data, offset, length, BitmapFactory.Options.inMutable);
     }
