@@ -45,8 +45,8 @@
             Bitmap finalBitmap = Bitmap.createBitmap(bitmapList.get(0).getWidth(), originalTotalHeight, Bitmap.Config.ARGB_8888);
             float delta = 0f;
             Canvas comboImage = new Canvas(finalBitmap);
-            for (int i = 0; i < numStages; i++) {
-                comboImage.translate(0f, -delta);
+            for (int i = numStages - 1; i >= 0 ; i--) {
+                comboImage.translate(0f, delta);
                 if (i > currentStage) {
                     comboImage.drawBitmap(bitmapList.get(i), 0f, 0f, paint);
                 } else {
