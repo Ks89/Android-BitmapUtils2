@@ -97,4 +97,22 @@
         return pieces;
     }
     
-    
+    //efficient way to get a mutable bitmap
+    public static Bitmap getMutableBitmap(byte[] data, int offset, int length) {
+        return BitmapFactory.decodeByteArray(data, offset, length, BitmapFactory.Options.inMutable);
+    }
+    public static Bitmap getMutableBitmap(String filePath) {
+        return BitmapFactory.decodeFile(data, offset, length, BitmapFactory.Options.inMutable);
+    }
+    public static Bitmap getMutableBitmap(FileDescriptor fd, Rect outPadding) {
+        return BitmapFactory.decodeFileDescriptor(fd, outPadding, BitmapFactory.Options.inMutable);
+    }
+    public static Bitmap getMutableBitmap(Resources res, int id, Rect outPadding) {
+        return BitmapFactory.decodeResource(res, id, BitmapFactory.Options.inMutable);
+    }
+    public static Bitmap getMutableBitmap(Resources res, TypedValue value, InputStream is, Rect pad) {
+        return BitmapFactory.decodeResourceStream(res, value, is, pad, BitmapFactory.Options.inMutable);
+    }
+    public static Bitmap getMutableBitmap(InputStream is, Rect outPadding) {
+        return BitmapFactory.decodeStream(is, outPadding, BitmapFactory.Options.inMutable);
+    }
