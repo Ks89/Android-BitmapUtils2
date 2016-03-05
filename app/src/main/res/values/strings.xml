@@ -14,7 +14,9 @@
         <item>Color 3/5 over grayscale</item>
         <item>Color 3/5 over grayscale vertical</item>
         <item>Yellow Silohuette</item>
-        <item>Scale inside frame</item>
+        <item>Scale transparent inside frame</item>
+        <item>Scale colored inside frame</item>
+        <item>Drawable to Bitmap</item>
         <item>Coming soon...</item>
         <item>Request a feature!!!</item>
     </string-array>
