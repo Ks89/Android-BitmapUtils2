@@ -1,10 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="it.stefanocappa.androidbitmaputilslib">
+    package="it.playfellas.androidbitmaputilslib">
 
     <application android:allowBackup="true"
         android:label="@string/app_name"
         android:supportsRtl="true">
-
     </application>
 
 </manifest>

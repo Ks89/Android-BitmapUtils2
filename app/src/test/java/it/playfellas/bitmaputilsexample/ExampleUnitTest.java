@@ -1,4 +1,4 @@
-package it.stefanocappa.bitmaputilsexample;
+package it.playfellas.bitmaputilsexample;
 
 import org.junit.Test;
 

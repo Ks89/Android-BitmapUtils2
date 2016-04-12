@@ -1,4 +1,4 @@
-package it.stefanocappa.bitmaputilsexample;
+package it.playfellas.bitmaputilsexample;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,8 +16,8 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnItemSelected;
-import it.stefanocappa.androidbitmaputilslib.BitmapUtils;
-import it.stefanocappa.androidbitmaputilslib.BitmapUtilsException;
+import it.playfellas.androidbitmaputilslib.BitmapUtils;
+import it.playfellas.androidbitmaputilslib.BitmapUtilsException;
 
 /**
  * Created by Stefano Cappa on 02/03/16.

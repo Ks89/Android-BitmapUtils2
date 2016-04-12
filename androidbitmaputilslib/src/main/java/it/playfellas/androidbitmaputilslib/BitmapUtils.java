@@ -1,4 +1,4 @@
-package it.stefanocappa.androidbitmaputilslib;
+package it.playfellas.androidbitmaputilslib;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -17,7 +17,6 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.util.Log;
 import android.util.TypedValue;
 
 import java.io.ByteArrayOutputStream;
@@ -345,13 +344,13 @@ public class BitmapUtils {
      * result:        v   v   v   x   x
      * indexes:              c-1  c
      * 0...1..2..3>(3-1)
-     * <p>
+     * <p/>
      * direction = Direction.RIGHT_2_LEFT
      * bitmap pieces: 0   1   2   3   4
      * result:        x   x   v   v   v
      * indexes:              c-1  c
      * 0..1<(3-1)
-     * <p>
+     * <p/>
      * direction = Direction.UP_2_DOWN
      * bitmap   |  result  |  indexes
      * pieces   |          |
@@ -360,7 +359,7 @@ public class BitmapUtils {
      * 2           v          c-1     2
      * 3           x           c    3>3-1
      * 4           x
-     * <p>
+     * <p/>
      * direction = Direction.DOWN_2_UP
      * bitmap   |  result  |  indexes
      * pieces   |          |

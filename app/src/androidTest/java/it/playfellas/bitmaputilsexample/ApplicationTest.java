@@ -1,4 +1,4 @@
-package it.stefanocappa.bitmaputilsexample;
+package it.playfellas.bitmaputilsexample;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
