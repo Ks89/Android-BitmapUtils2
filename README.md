@@ -6,7 +6,7 @@ Absolutely unstable.
 
 ## License
 
-Copyright 2015 Lorenzo Affetti, Giacomo Bresciani, Stefano Cappa
+Copyright 2016 Lorenzo Affetti, Giacomo Bresciani, Stefano Cappa
 
 Unless explicitly stated otherwise all files in this repository are
 licensed under the Apache License, Version 2.0 (the "License");
